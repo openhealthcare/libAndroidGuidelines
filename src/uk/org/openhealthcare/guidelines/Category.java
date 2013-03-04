@@ -66,18 +66,15 @@ public class Category extends Object {
 	public static void Clear() {
 		
 	}	
-	
+		
 	/**
 	 * Create a new category table, only called when the DB is 
 	 * created. 
 	 */
 	public static void CreateTable(SQLiteDatabase db) {
-		String q = "CREATE TABLE category ( " +
-						"_id integer primary key autoincrement, " +
-						"name text NOT NULL, " + 
-						"parent_id integer" +
-					"); ";
-		db.execSQL(q);
+		for (int i=0; i<PATCHES.length; i++) {
+		    PATCHES[i].apply(db);
+		  }		
 	}
 
 	/**
@@ -85,8 +82,25 @@ public class Category extends Object {
 	 * @return 
 	 */
 	public static void UpgradeTable(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// we'll probably do this by maintaining a map of version against the SQL to run
-		// to upgrade, running all of them from oldVersion to newVersion.
+		for (int i=oldVersion; i>newVersion; i++) {
+			PATCHES[i-1].apply(db);
+		}
 	}
 
+	private static final DBPatch[] PATCHES = new DBPatch[] {
+		   new DBPatch() {
+		      public void apply(SQLiteDatabase db) {
+		  		String q = "CREATE TABLE category ( " +
+		  			"_id integer primary key autoincrement, " +
+					"name text NOT NULL, " + 
+					"parent_id integer " +
+				");";
+				db.execSQL(q);
+		      }
+		 
+		      public void revert(SQLiteDatabase db) {
+		         db.execSQL("drop table category;");
+		      }
+		   }
+		};
 }

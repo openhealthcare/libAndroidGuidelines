@@ -5,6 +5,7 @@ package uk.org.openhealthcare.guidelines;
 
 import java.util.List;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -23,11 +24,34 @@ public class Guideline {
 		
 	}
 	
-	public void LoadFromDb() {
-		
+	public static Guideline LoadFromDb(SQLiteDatabase db, long id) {
+	    Cursor cursor = db.rawQuery("SELECT _id, name, url, onDisk, category_id FROM category WHERE _id = ?;", 
+	    	new String[]{Long.toString(id)});
+	    cursor.moveToFirst();
+	    
+	    Guideline g = loadFromCursor(db, cursor);
+	    cursor.close();
+	    return g;
 	}
 	
-	public static List<Guideline> GetForCategeory(Category parent) {
+	private static Guideline loadFromCursor(SQLiteDatabase db,Cursor cursor) {
+		Guideline g = new Guideline();
+	    g.Id = cursor.getLong(0);
+	    g.name = cursor.getString(1);
+	    g.url = cursor.getString(2);
+	    try {
+	    	g.onDisk = cursor.getString(3);
+	    } catch (Exception e) {}
+	    
+	    try {
+	    	g.category= Category.LoadFromDb(db, cursor.getLong(4));
+	    } catch (Exception e ) {
+	    	// Nothing to do, there's no parent_id or category
+	    }
+		return g;
+	}
+	
+	public static List<Guideline> GetForCategory(Category parent) {
 		return null;
 	}
 			

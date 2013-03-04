@@ -10,8 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
  * @author Ross Jones (ross.jones@openhealthcare.org.uk)
  */
 public class Category extends Object {
-
-	private static final String[] allColumns = { "_id", "name", "parent_id"};	
 	
 	public long Id;
 	public String name;

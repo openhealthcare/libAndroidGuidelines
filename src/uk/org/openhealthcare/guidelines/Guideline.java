@@ -42,7 +42,7 @@ public class Guideline {
 	 */
 	public static void UpgradeTable(SQLiteDatabase db, int oldVersion, int newVersion) {
 		for (int i=oldVersion; i>newVersion; i++) {
-			PATCHES[i-1].apply(db);
+			PATCHES[i].apply(db);
 		}
 	}
 

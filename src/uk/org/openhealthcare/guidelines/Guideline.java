@@ -3,9 +3,9 @@
  */
 package uk.org.openhealthcare.guidelines;
 
-import java.util.List;
 
-import android.database.Cursor;
+import org.w3c.dom.Element;
+
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -14,51 +14,17 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public class Guideline {
 
+	public static String TABLE_NAME = "guideline";
+	
 	public long Id;
-	public String name;
-	public String url;
-	public String onDisk;
-	public Category category;
+	public String Name;
+	public String Url;
+	public String OnDisk;
+	public Category Category;
 	
-	public void LoadFromXml() {
-		
+	public static Guideline LoadFromXml(Element node) {
+		return new Guideline();
 	}
-	
-	public static Guideline LoadFromDb(SQLiteDatabase db, long id) {
-	    Cursor cursor = db.rawQuery("SELECT _id, name, url, onDisk, category_id FROM category WHERE _id = ?;", 
-	    	new String[]{Long.toString(id)});
-	    cursor.moveToFirst();
-	    
-	    Guideline g = loadFromCursor(db, cursor);
-	    cursor.close();
-	    return g;
-	}
-	
-	private static Guideline loadFromCursor(SQLiteDatabase db,Cursor cursor) {
-		Guideline g = new Guideline();
-	    g.Id = cursor.getLong(0);
-	    g.name = cursor.getString(1);
-	    g.url = cursor.getString(2);
-	    try {
-	    	g.onDisk = cursor.getString(3);
-	    } catch (Exception e) {}
-	    
-	    try {
-	    	g.category= Category.LoadFromDb(db, cursor.getLong(4));
-	    } catch (Exception e ) {
-	    	// Nothing to do, there's no parent_id or category
-	    }
-		return g;
-	}
-	
-	public static List<Guideline> GetForCategory(Category parent) {
-		return null;
-	}
-			
-	public static void Clear() {
-		
-	}	
-	
 	
 	/**
 	 * Create a new category table, only called when the DB is 
@@ -83,7 +49,7 @@ public class Guideline {
 	private static final DBPatch[] PATCHES = new DBPatch[] {
 		   new DBPatch() {
 		      public void apply(SQLiteDatabase db) {
-		  		String q = "CREATE TABLE guideline ( " +
+		  		String q = "CREATE TABLE " + TABLE_NAME  + " ( " +
 		  			"_id integer primary key autoincrement, " +
 					"name text NOT NULL, " + 
 					"url text NOT NULL, " +						
@@ -94,7 +60,7 @@ public class Guideline {
 		      }
 		 
 		      public void revert(SQLiteDatabase db) {
-		         db.execSQL("drop table guideline;");
+		         db.execSQL("drop table " + TABLE_NAME + ";");
 		      }
 		   }
 		};
